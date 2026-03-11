@@ -1,0 +1,146 @@
+{
+  "name": "Agent1",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "authentication": "airtableTokenApi",
+        "baseId": {
+          "__rl": true,
+          "value": "https://airtable.com/appZhc51AFLrRXmtq/tblAbcOV8uTIadDXm/viwehBzSkpvajKvSm?blocks=hide",
+          "mode": "url"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "https://airtable.com/appZhc51AFLrRXmtq/tblAbcOV8uTIadDXm/viwehBzSkpvajKvSm?blocks=hide",
+          "mode": "url"
+        },
+        "triggerField": "Ticket ID",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        -16
+      ],
+      "id": "e8146095-6106-4afb-92c8-9465363b6e9a",
+      "name": "Airtable Trigger",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "y89etGjJzbn47B81",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are the IT Support Team’s coordinator. Your task is to collect incoming information about new support tickets and produce a concise summary to email to the IT management. The email should be signed with “IT Support Team”.\nHere are the details of the support tickets:\nTicket ID:{{ $json.fields['Ticket ID'] }}\nUser:{{ $json.fields.User }}\nIssue:{{ $json.fields.Issue }}\nPriority:{{ $json.fields.Priority }}\nDate Submitted:{{ $json.fields['Data Submitted'] }}\nStatus:{{ $json.fields.Status }}\nPlease provide the following output parameters:\nEmail_subject\nEmail_content\nMake the content clean and with bullet points"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_object"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -304,
+        -16
+      ],
+      "id": "4db7530e-7ddd-4a04-aa13-b15e50d8f867",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "G6PgSugd59FGWoz3",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "bashirkahf1400@gmail.com",
+        "subject": "={{ $json.output[0].content[0].text.Email_subject }}",
+        "emailType": "text",
+        "message": "={{ $json.output[0].content[0].text.Email_content }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        -96
+      ],
+      "id": "1f0f6f02-001f-457c-ae08-96c82a274809",
+      "name": "Send a message",
+      "webhookId": "2fef4418-c38d-4fd4-a45b-8a6c442394ef",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rnENsJ6hCiTJt3Xk",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Airtable Trigger": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c473d369-0268-48bc-adb3-889db1913dfb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ddab32788740e0db42839696137fc4d9a27760865ee2c2d4f4eb78a8896a7f2c"
+  },
+  "id": "l63t4facb4a074xb",
+  "tags": []
+}
